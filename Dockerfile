@@ -15,7 +15,6 @@ COPY --from=build /home/node/mining-pool/node_modules /home/node/mining-pool/nod
 
 USER root
 RUN apk add tini
-RUN mkdir /home/node/mining-pool/logs && chown node /home/node/mining-pool/logs
 
 USER node
 WORKDIR /home/node/mining-pool
@@ -23,7 +22,6 @@ WORKDIR /home/node/mining-pool
 ENV NODE_ENV=production
 
 EXPOSE 20032
-VOLUME /home/node/mining-pool/logs
 
 ADD ./package.json /home/node/mining-pool/package.json
 ADD ./lib /home/node/mining-pool/lib

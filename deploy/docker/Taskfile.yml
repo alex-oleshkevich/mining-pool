@@ -1,0 +1,35 @@
+version: '3'
+env:
+    DOCKER_BUILDKIT: 1
+vars:
+    GIT_BRANCH:
+        sh: "git rev-parse --symbolic-full-name --abbrev-ref HEAD"
+    GIT_REVISION:
+        sh: "git rev-parse --short HEAD"
+    DOCKER_IMAGE: ""
+    BUILD_DATE: '{{ now | date "2006-01-02 15:04:05" }}'
+tasks:
+    build:
+        desc: "Build Docker image"
+        cmds:
+            - docker pull {{ .DOCKER_IMAGE }}:{{ .GIT_BRANCH }} || true
+            - >
+                docker build
+                --build-arg GIT_REVISION={{ .GIT_REVISION }}
+                --build-arg CI_BUILD_DATE="{{ .BUILD_DATE }}"
+                --cache-from {{ .DOCKER_IMAGE }}:{{ .GIT_BRANCH }}
+                -t {{ .DOCKER_IMAGE }}:{{ .GIT_BRANCH }}
+                -t {{ .DOCKER_IMAGE }}:{{ .GIT_REVISION }}
+                .
+
+    push:
+        desc: "Push Docker image"
+        cmds:
+            - docker push {{ .DOCKER_IMAGE }}:{{ .GIT_BRANCH }}
+            - docker push {{ .DOCKER_IMAGE }}:{{ .GIT_REVISION }}
+
+    release: 
+        desc: "Release Docker image"
+        cmds:
+            - {task: build}
+            - {task: push}

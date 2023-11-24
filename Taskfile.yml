@@ -1,0 +1,66 @@
+version: "3"
+env:
+    DOCKER_BUILDKIT: 1
+
+includes:
+    tf: { taskfile: ./deploy/terraform, optional: true }
+    ansible: { taskfile: ./deploy/ansible, optional: true }
+    docker:
+        taskfile: ./deploy/docker/
+        vars:
+            DOCKER_IMAGE: "ghcr.io/alphpool/stratum-alephium"
+
+tasks:
+    mine:
+        desc: "Run T-rex miner"
+        dir: local/
+        cmds:
+            - ./t-rex -a blake3 -o stratum+tcp://localhost:20032 -u 1Eca6C63Rpw55kgJDk8jm1ZNGjxbQ5YxHADRE7Ffc4UHU -p x -w miner1 {{ .CLI_ARGS }}
+
+    mine:miner2:
+        desc: "Run T-rex miner2"
+        dir: local/
+        cmds:
+            - ./t-rex -a blake3 -o stratum+tcp://localhost:20032 -u 1Ds2sT6dkhbpMsimzX77Vh2vuSJjgLYauezyw9m2jYrAq -p x -w miner2 {{ .CLI_ARGS }}
+
+    mine:miner3:
+        desc: "Run T-rex miner3"
+        dir: local/
+        cmds:
+            - ./t-rex -a blake3 -o stratum+tcp://localhost:20032 -u 15bMbhnRxhQ1qRMw22EuCCBmcZA5y4JvyiqencengFQq7 -p x -w miner3 {{ .CLI_ARGS }}
+
+    mine:prod:
+        desc: "Run T-rex miner (prod)"
+        dir: local/
+        cmds:
+            - ./t-rex -a blake3 -o stratum+tcp://eu.alph-pool.com:20032 -u 18qqxGWFq1MrHXPfyw2wTmQcqf5kUCMU6mhV94AUaLo5H -p x -w alexpc {{ .CLI_ARGS }}
+
+    mine:bzminer:
+        desc: "Run T-rex miner (prod)"
+        dir: local/
+        cmds:
+            - ./bzminer -a alph -p stratum+tcp://us.alph-pool.com:20032 -w 1Eca6C63Rpw55kgJDk8jm1ZNGjxbQ5YxHADRE7Ffc4UHU -w alexpc {{ .CLI_ARGS }}
+
+    mine:lolminer:
+        desc: "Run lolminer"
+        dir: local/
+        cmds:
+            - ./lolMiner --algo ALEPH --pool stratum+tcp://localhost:20032 --user 1Eca6C63Rpw55kgJDk8jm1ZNGjxbQ5YxHADRE7Ffc4UHU.alexpc --pass x {{ .CLI_ARGS }}
+
+    mine:prod:solo:lolminer:
+        desc: "Run T-rex miner (prod)"
+        dir: local/
+        cmds:
+            - ./lolMiner --algo ALEPH --pool stratum+tcp://eu.alph-pool.com:20042 --user 1Eca6C63Rpw55kgJDk8jm1ZNGjxbQ5YxHADRE7Ffc4UHU.alexpc --pass x {{ .CLI_ARGS }}
+
+    mine:prod:solo:tls:lolminer:
+        desc: "Run T-rex miner (prod)"
+        dir: local/
+        cmds:
+            - ./lolMiner --algo ALEPH --pool stratum+ssl://eu.alph-pool.com:20043 --user 1Eca6C63Rpw55kgJDk8jm1ZNGjxbQ5YxHADRE7Ffc4UHU.alexpc --pass x {{ .CLI_ARGS }}
+
+    release:
+        desc: "Release new version"
+        cmds:
+            - { task: "docker:release" }
+            - { task: "ansible:deploy" }

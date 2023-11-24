@@ -27,15 +27,13 @@
         "url": "https://github.com/alephium/mining-pool.git"
     },
     "dependencies": {
+        "amqplib": "^0.10.3",
         "base58-native": "*",
         "bignum": "0.13.1",
         "binary-parser": "2.0.2",
         "blake3": "2.1.7",
         "findhit-proxywrap": "^0.3.13",
-        "ioredis": "^4.28.2",
-        "pg": "^8.7.1",
-        "winston": "^3.3.3",
-        "winston-daily-rotate-file": "^4.5.5"
+        "winston": "^3.3.3"
     },
     "engines": {
         "node": ">=14"

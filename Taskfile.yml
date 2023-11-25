@@ -8,7 +8,7 @@ includes:
     docker:
         taskfile: ./deploy/docker/
         vars:
-            DOCKER_IMAGE: "ghcr.io/alphpool/stratum-alephium"
+            DOCKER_IMAGE: "github.com/alex-oleshkevich/mining-pool"
 
 tasks:
     mine:
